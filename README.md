@@ -1,4 +1,2 @@
 # Mod2_Capstone
-TEnmo
-
-new information!
+TEnmo edition of well know Venmo App.
