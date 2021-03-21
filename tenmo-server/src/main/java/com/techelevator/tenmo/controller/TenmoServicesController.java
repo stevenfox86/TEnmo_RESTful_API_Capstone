@@ -23,7 +23,7 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 
-//@PreAuthorize("isAuthenticated()")
+@PreAuthorize("isAuthenticated()")
 @RestController
 public class TenmoServicesController {
 
@@ -122,5 +122,19 @@ public class TenmoServicesController {
 
 		tsDAO.rejectedTransfer(transferID);
 	}
+	
+	@RequestMapping(path = "/transfers/transfer_status_id_1", method = RequestMethod.GET)
+	public List<Transfer> getAllPendingTransfers() {
+		return tsDAO.getAllPendingTransfers();
+	}
 
+	@RequestMapping(path = "/transfers/{transferId}/amount", method = RequestMethod.GET)
+	public BigDecimal getAmountByTransferID(@PathVariable int transferId) {
+		return tsDAO.getTransferAmountByTransferID(transferId);
+	}
+	
+	@RequestMapping(path = "/transfers/{transferID}/accounts", method = RequestMethod.GET)
+	public int getUserFromTransferID(@PathVariable int transferID) throws UserIdNotFoundException {
+		return tsDAO.getUserIdFromTransferId(transferID);
+	}
 }
