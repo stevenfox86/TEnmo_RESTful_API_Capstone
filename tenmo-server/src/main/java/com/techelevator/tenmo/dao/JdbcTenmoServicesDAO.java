@@ -26,7 +26,7 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	// GETS USERS CURRENT BALANCE BY USER ID
+	// GETS CURRENT_USERS BALANCE BY USER ID
 	@Override
 	public BigDecimal getUserCurrentBalanceByID(int userId) {
 
@@ -58,25 +58,7 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 		return users;
 	}
 
-	// UPDATES BALANCE OF RECIPIENT OF FUNDS
-	@Override
-	public void UpdateToUserBalance(int toUser, BigDecimal amountTEBucks) throws UserIdNotFoundException {
-
-		String sqlToUser = "UPDATE accounts SET balance = ? WHERE user_id = ?";
-		jdbcTemplate.update(sqlToUser, amountTEBucks, toUser);
-
-	}
-
-	// UPDATES BALANCE OF SENDER OF FUNDS
-	@Override
-	public void UpdateFromUserBalance(int fromUser, BigDecimal amountTEBucks) throws UserIdNotFoundException {
-
-		String sqlFromUser = "UPDATE accounts SET balance = ? WHERE user_id = ?";
-		jdbcTemplate.update(sqlFromUser, amountTEBucks, fromUser);
-
-	}
-
-	// CREATES A TRANSFER
+	// CREATE A TRANSFER
 	public void transfer(int fromUser, int toUser, BigDecimal amountTEBucks) throws UserIdNotFoundException {
 
 		try {
@@ -86,6 +68,24 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 
 		} catch (DataAccessException e) {
 		}
+	}
+
+	// UPDATE BALANCE RECIPIENT OF FUNDS
+	@Override
+	public void UpdateToUserBalance(int toUser, BigDecimal amountTEBucks) throws UserIdNotFoundException {
+
+		String sqlToUser = "UPDATE accounts SET balance = ? WHERE user_id = ?";
+		jdbcTemplate.update(sqlToUser, amountTEBucks, toUser);
+
+	}
+
+	// UPDATE BALANCE SENDER OF FUNDS
+	@Override
+	public void UpdateFromUserBalance(int fromUser, BigDecimal amountTEBucks) throws UserIdNotFoundException {
+
+		String sqlFromUser = "UPDATE accounts SET balance = ? WHERE user_id = ?";
+		jdbcTemplate.update(sqlFromUser, amountTEBucks, fromUser);
+
 	}
 
 	// CREATES A LIST OF ALL TRANSFERS
@@ -105,7 +105,33 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 		return allTransfers;
 	}
 
-	// GET TRASNFER DETAILS BY TRANSFER ID
+	// GET USER_ID FROM ACCOUNT_ID
+	@Override
+	public int getUserIdFromAccountId(int accountId) {
+
+		// should we make an account not found exception?
+
+		int userId = 0;
+
+		String sql = "SELECT user_id FROM accounts WHERE account_id = ?";
+		userId = jdbcTemplate.queryForObject(sql, int.class, accountId);
+
+		return userId;
+	}
+
+	// GET USERNAME FROM USER_ID
+	@Override
+	public String getUsernameFromUserId(int userId) throws UserIdNotFoundException {
+
+		String username = "";
+
+		String sql = "SELECT username FROM users WHERE user_id = ?";
+		username = jdbcTemplate.queryForObject(sql, String.class, userId);
+
+		return username;
+	}
+
+	// GET TRASNFER DETAILS BY TRANSFER_ID
 	@Override
 	public Transfer getTransferByID(long transferID) throws TransferIdNotFoundException {
 
@@ -122,46 +148,7 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 
 	}
 
-	// GET ACCOUNT ID FROM USER ID
-	@Override
-	public int getAccountIdFromUserId(int userId) throws UserIdNotFoundException {
-
-		int accountId = 0;
-
-		String sql = "SELECT account_id FROM accounts WHERE user_id = ?";
-		accountId = jdbcTemplate.queryForObject(sql, int.class, userId);
-
-		return accountId;
-
-	}
-
-	// GET USERNAME FROM ID
-	@Override
-	public String getUsernameFromUserId(int userId) throws UserIdNotFoundException {
-
-		String username = "";
-
-		String sql = "SELECT username FROM users WHERE user_id = ?";
-		username = jdbcTemplate.queryForObject(sql, String.class, userId);
-
-		return username;
-	}
-
-	// GET USER ID FROM ACCOUNT ID
-	@Override
-	public int getUserIdFromAccountId(int accountId) {
-
-		// should we make an account not found exception?
-
-		int userId = 0;
-
-		String sql = "SELECT user_id FROM accounts WHERE account_id = ?";
-		userId = jdbcTemplate.queryForObject(sql, int.class, accountId);
-
-		return userId;
-	}
-
-	// GET TRANSFER TYPE DESCRIPTION FROM TRANSFER TYPE ID
+	// GET TRANSFER_TYPE_DESCRIPTION FROM TRANSFER_TYPE_ID
 	@Override
 	public String getTransferTypeDescFromTransferTypeId(int transferTypeId) {
 
@@ -174,7 +161,7 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 
 	}
 
-	// GET TRANSFER STATUS DESCRIPTION FROM TRANSFER STATUS ID
+	// GET TRANSFER_STATUS_DESCRIPTION FROM TRANSFER_STATUS_ID
 	@Override
 	public String getTransferStatusDescFromTransferStatusId(int transferStatusId) {
 
@@ -187,39 +174,54 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 		return TransfStatusDesc;
 
 	}
-	
-	
+
+	// CREATE A TRANSFER - TRASNFER TYPE REQUEST
 	@Override
 	public void requestTransfer(int fromUser, int toUser, BigDecimal amountTEBucks) throws UserIdNotFoundException {
-		
+
 		try {
 			String sql = "INSERT INTO transfers(transfer_type_id, transfer_status_id, account_from, account_to, amount) \r\n"
 					+ "VALUES(1, 1, ?, ?, ?)";
 			jdbcTemplate.update(sql, fromUser, toUser, amountTEBucks);
 
 		} catch (DataAccessException e) {
-			
+
 		}
-		
+
 	}
 
+	// GET ACCOUNT_ID FROM USER_ID
+	@Override
+	public int getAccountIdFromUserId(int userId) throws UserIdNotFoundException {
+
+		int accountId = 0;
+
+		String sql = "SELECT account_id FROM accounts WHERE user_id = ?";
+		accountId = jdbcTemplate.queryForObject(sql, int.class, userId);
+
+		return accountId;
+
+	}
+
+	// UPDATE TRANSFER STATUS TO APPROVED
 	@Override
 	public void approvedTransfer(int transferID) {
-		
+
 		String sqlFromUser = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
 		jdbcTemplate.update(sqlFromUser, transferID);
 
-		
 	}
 
+	// UPDATE TRANSFER STATUS TO REJECTED
 	@Override
 	public void rejectedTransfer(int transferID) {
-		
+
 		String sqlFromUser = "UPDATE transfers SET transfer_status_id = 3 WHERE transfer_id = ?";
 		jdbcTemplate.update(sqlFromUser, transferID);
-		
+
 	}
-	
+
+	// GET A LIST OF ALL TRANSFERS - TRANSFER STATUS PENDING
 	@Override
 	public List<Transfer> getAllPendingTransfers() {
 		List<Transfer> allPendingTransfers = new ArrayList<>();
@@ -234,30 +236,30 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 		}
 		return allPendingTransfers;
 	}
-	
+
+	// GET TRANSFER AMOUNT BY TRANSFER_ID
 	@Override
 	public BigDecimal getTransferAmountByTransferID(int transferID) {
-		
+
 		String sql = "SELECT amount FROM transfers WHERE transfer_id = ?";
 
 		BigDecimal result = jdbcTemplate.queryForObject(sql, BigDecimal.class, transferID);
 
 		return result;
 	}
-	
+
+	// GET USER_ID FROM TRANSFER_ID
 	@Override
 	public int getUserIdFromTransferId(int transferID) {
 		int userId = 0;
 
 		String sql = "SELECT user_id from accounts INNER JOIN transfers ON"
 				+ " accounts.account_id = transfers.account_from WHERE transfer_id = ?";
-		
+
 		userId = jdbcTemplate.queryForObject(sql, int.class, transferID);
 
 		return userId;
 	}
-
-	
 
 	// MAP ROW TO - METHODS
 	private User mapRowToUser(SqlRowSet rs) {

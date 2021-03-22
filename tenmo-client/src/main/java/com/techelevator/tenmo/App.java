@@ -100,7 +100,6 @@ public class App {
 	}
 
 	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
 		System.out.println("-------------------------------------------------------");
 		System.out.println("Transfers");
 		System.out.println("ID         \t From/To		Amount");
@@ -147,17 +146,17 @@ public class App {
 
 			try {
 				currentTenmoService.approveTransfer(inputTransferId);
-				currentTenmoService.currentUserAccountUpdate(currentUser.getUser().getId(), currentTenmoService.getAmountByTransferId(inputTransferId));
+				currentTenmoService.currentUserAccountUpdate(currentUser.getUser().getId(),
+						currentTenmoService.getAmountByTransferId(inputTransferId));
 				int recievingUserId = currentTenmoService.getRecUserIdByTranferId(inputTransferId);
-				currentTenmoService.recievingUserAccountUpdate(recievingUserId , currentTenmoService.getAmountByTransferId(inputTransferId));
-				System.out.println("Congratulations, you have approved the transfer of $" + currentTenmoService.getAmountByTransferId(inputTransferId));
-//				****************************************
-//				WE ARE SUCCESFULLY CHANGING A PENDING TRANSFER TO APPROVED
-//				WE NEED TO UPDATE BALNCES DUE TO APPROVED TRANSFER
-//				****************************************
-//				DEAL WITH PUSHING 0 - TO EXIT & SOME COMMENTS AND SYSTEM PRINT AND ERRORS
-				
-				
+				currentTenmoService.recievingUserAccountUpdate(recievingUserId,
+						currentTenmoService.getAmountByTransferId(inputTransferId));
+				System.out.println("Congratulations, you have approved the transfer of $"
+						+ currentTenmoService.getAmountByTransferId(inputTransferId));
+				// ****************************************
+				// @TODO: DEAL WITH USER PUSHING 0 - TO EXIT & ADD SOME COMMENTS AND CHECK
+				// SYSTEM PRINT AND ERRORS HANDLING
+
 			} catch (TenmoServiceException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

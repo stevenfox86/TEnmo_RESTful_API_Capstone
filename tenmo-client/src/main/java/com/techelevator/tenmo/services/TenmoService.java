@@ -180,22 +180,22 @@ public class TenmoService {
 		// ITERATE THROUGH TRANSFER ARRAY
 		for (Transfer thisTransfer : transferArray) {
 
-			// EXCHANGE "ACCOUNT_TO" FOR THE RECEIVING USERS ID
+			// EXCHANGE ACCOUNT_ID ("ACCOUNT_TO") FOR RECEIVING USER_ID
 			toUserId = restTemplate.exchange(BASE_URL + "/accounts/" + thisTransfer.getAccount_to() + "/userId",
 					HttpMethod.GET, makeAuthEntity(), int.class).getBody();
 
-			// EXCHANGE RECEIVING USERS ID FOR RECEIVING USERS NAME
+			// EXCHANGE RECEIVING USER_ID FOR RECEIVING USERSNAME
 			toUserName = restTemplate.exchange(BASE_URL + "/users/" + toUserId + "/username", HttpMethod.GET,
 					makeAuthEntity(), String.class).getBody();
 
-			// CHECK UF CURRENT USERNAME EQUALS THE RECEIVING USERS NAME
+			// CHECK UF CURRENT USERNAME EQUALS THE RECEIVING USERSNAME
 			if (App.USER_NAME.equals(toUserName)) {
 
-				// EXCHANGE "ACCOUNT_FOM" FOR THE SEDING USERS ID
+				// EXCHANGE ACCOUNT_ID ("ACCOUNT_FROM") FOR THE SENDING USER_ID
 				fromUserId = restTemplate.exchange(BASE_URL + "/accounts/" + thisTransfer.getAccount_from() + "/userId",
 						HttpMethod.GET, makeAuthEntity(), int.class).getBody();
 
-				// EXCHANGE SEDNING USERS ID FOR THE SEDING USERS NAME
+				// EXCHANGE SENDING USER_ID FOR SENDING USERNAME
 				fromUsername = restTemplate.exchange(BASE_URL + "/users/" + fromUserId + "/username", HttpMethod.GET,
 						makeAuthEntity(), String.class).getBody();
 
@@ -212,27 +212,27 @@ public class TenmoService {
 		// ITERATE THROUGH TRANSFER ARRAY
 		for (Transfer thisTransfer : transferArray2) {
 
-			// EXCHANGE "ACCOUNT_FOM" FOR THE SEDING USERS ID
+			// EXCHANGE ACCOUNT_ID ("ACCOUNT_FROM") FOR THE SENDING USER_ID
 			fromUserId = restTemplate.exchange(BASE_URL + "/accounts/" + thisTransfer.getAccount_from() + "/userId",
 					HttpMethod.GET, makeAuthEntity(), int.class).getBody();
 
-			// EXCHANGE SEDNING USERS ID FOR THE SEDING USERS NAME
+			// EXCHANGE SENDING USER_ID FOR SENDING USERSNAME
 			fromUsername = restTemplate.exchange(BASE_URL + "/users/" + fromUserId + "/username", HttpMethod.GET,
 					makeAuthEntity(), String.class).getBody();
 
-			// CHECK UF CURRENT USERNAME EQUALS THE SENDING USERS NAME
+			// CHECK UF CURRENT USERNAME EQUALS THE SENDING USERSNAME
 			if (App.USER_NAME.equals(fromUsername)) {
 
-				// EXCHANGE "ACCOUNT_TO" FOR THE RECEIVING USERS ID
+				// EXCHANGE ACCOUNT_ID ("ACCOUNT_TO") FOR RECEIVING USER_ID
 				toUserId = restTemplate.exchange(BASE_URL + "/accounts/" + thisTransfer.getAccount_to() + "/userId",
 						HttpMethod.GET, makeAuthEntity(), int.class).getBody();
 
-				// EXCHANGE RECEIVING USERS ID FOR RECEIVING USERS NAME
+				// EXCHANGE RECEIVING USER_ID FOR RECEIVING USERSNAME
 				toUserName = restTemplate.exchange(BASE_URL + "/users/" + toUserId + "/username", HttpMethod.GET,
 						makeAuthEntity(), String.class).getBody();
 
-				System.out.println(
-						thisTransfer.getTransfer_id() + "\t\tTo: " + toUserName + "\t\t\t$ " + thisTransfer.getAmount());
+				System.out.println(thisTransfer.getTransfer_id() + "\t\tTo: " + toUserName + "\t\t\t$ "
+						+ thisTransfer.getAmount());
 
 			}
 		}
@@ -250,28 +250,28 @@ public class TenmoService {
 		String transferStatus = "";
 
 		try {
-			// EXCHANGE TRANSFER ID FOR TRANSFOR DETAILS
+			// EXCHANGE TRANSFER ID FOR TRANSFER DETAILS
 			selectedTransfer = restTemplate
 					.exchange(BASE_URL + "/transfers/" + transferId, HttpMethod.GET, makeAuthEntity(), Transfer.class)
 					.getBody();
 
-			// EXCHANGE "ACCOUNT_FOM" FOR THE SEDING USER ID
+			// EXCHANGE ACCOUNT_ID ("ACCOUNT_FROM") FOR THE SENDING USER_ID
 			fromUserId = restTemplate.exchange(BASE_URL + "/accounts/" + selectedTransfer.getAccount_from() + "/userId",
 					HttpMethod.GET, makeAuthEntity(), int.class).getBody();
-			// EXCHANGE SEDNING USERS ID FOR THE SEDING USER NAME
+			// EXCHANGE SEDNING USER_ID FOR THE SENDING USERNAME
 			fromUserName = restTemplate.exchange(BASE_URL + "/users/" + fromUserId + "/username", HttpMethod.GET,
 					makeAuthEntity(), String.class).getBody();
-			// EXCHANGE "ACCOUNT_TO" FOR THE RECEIVING USER ID
+			// EXCHANGE ACCOUNT_ID ("ACCOUNT_TO") FOR THE RECEIVING USER_ID
 			toUserId = restTemplate.exchange(BASE_URL + "/accounts/" + selectedTransfer.getAccount_to() + "/userId",
 					HttpMethod.GET, makeAuthEntity(), int.class).getBody();
-			// EXCHANGE RECEIVING USERS ID FOR RECEIVING USER NAME
+			// EXCHANGE RECEIVING USER_ID FOR RECEIVING USERNAME
 			toUserName = restTemplate.exchange(BASE_URL + "/users/" + toUserId + "/username", HttpMethod.GET,
 					makeAuthEntity(), String.class).getBody();
 			// EXCHANGE TRANSFER TYPE ID - CODE - FOR DESCRIPTION OF TRANSFER "SEND"
 			transferType = restTemplate.exchange(
 					BASE_URL + "/transfer_types/" + selectedTransfer.getTransfer_type_id() + "/trasnfer_type_desc",
 					HttpMethod.GET, makeAuthEntity(), String.class).getBody();
-			// EXCAHNGE TRANSFER STATUS ID -CODE - FOR STATUS OF TRANSFER "APPROVE"
+			// EXCAHNGE TRANSFER STATUS ID -CODE - FOR STATUS OF TRANSFER "APPROVED"
 			transferStatus = restTemplate
 					.exchange(BASE_URL + "/transfer_statuses/" + selectedTransfer.getTransfer_status_id()
 							+ "/transfer_status_desc", HttpMethod.GET, makeAuthEntity(), String.class)
@@ -286,8 +286,7 @@ public class TenmoService {
 		}
 
 	}
-	
-	
+
 	public void requestATransfer(int accountFromUserId, int accountToUserId, BigDecimal amountTEBucks)
 			throws TenmoServiceException {
 
@@ -311,54 +310,52 @@ public class TenmoService {
 		transferObject.setAccount_to(toUserAccountId);
 		transferObject.setAmount(amountTEBucks);
 
-			try {
-
-				// MAKE A TRANSFER REQUEST
-				restTemplate.exchange(BASE_URL + "/transfers/request", HttpMethod.POST, makeTransferEntity(transferObject),
-						Transfer.class);
-				
-			} catch (RestClientResponseException ex) {
-
-				throw new TenmoServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
-			}
-		}
-	
-	
-	public void approveTransfer(int transferID) throws TenmoServiceException {
-
-		Transfer selectedTransfer = new Transfer();
-		//GET TRANSFER BY ID TO UPDATE TRANSFER 
-		selectedTransfer = restTemplate
-				.exchange(BASE_URL + "/transfers/" + transferID, HttpMethod.GET, makeAuthEntity(), Transfer.class)
-				.getBody();
-		
-		  // SETTING THE SENDING USER BALANCE TO A VARIABLE 
-		BigDecimal currentUserBalance = viewCurrentBalance(App.USER_ID);
-		  
-		  // SUBTRACT THE FUNDS TRANSFERED FROM THE SENDER'S BALANCE 
-		BigDecimal currentUserUpdatedBalance = currentUserBalance.subtract(selectedTransfer.getAmount());
-		  
-		  // CREATE ZERO BALANCE VARIABLE IN BIG DECIMAL 
-		BigDecimal zeroBalance = new BigDecimal(0);
-		 
-
-		// MAKE SURE THE SENDING USER HAS AT LEAST $0.00 LEFT AFTER TRANSFER
-		if (currentUserUpdatedBalance.compareTo(zeroBalance) >= 0) {
-		
-		// CREATE A TRANSFER OBJECT TO CREATE AN APPROVED TRANSFER
-		Transfer transferObject = new Transfer();
-		transferObject.setTransfer_id(transferID);
-		transferObject.setTransfer_status_id(2);
-
 		try {
-			// SEND TRANSFER UPDATE
-			restTemplate.exchange(BASE_URL + "/transfers/" + transferID + "/approval/", HttpMethod.PUT,
-					makeTransferEntity(transferObject), Transfer.class);
+
+			// MAKE A TRANSFER REQUEST
+			restTemplate.exchange(BASE_URL + "/transfers/request", HttpMethod.POST, makeTransferEntity(transferObject),
+					Transfer.class);
 
 		} catch (RestClientResponseException ex) {
 
 			throw new TenmoServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 		}
+	}
+
+	public void approveTransfer(int transferID) throws TenmoServiceException {
+
+		Transfer selectedTransfer = new Transfer();
+		// GET TRANSFER BY ID TO UPDATE TRANSFER
+		selectedTransfer = restTemplate
+				.exchange(BASE_URL + "/transfers/" + transferID, HttpMethod.GET, makeAuthEntity(), Transfer.class)
+				.getBody();
+
+		// SETTING THE SENDING USER BALANCE TO A VARIABLE
+		BigDecimal currentUserBalance = viewCurrentBalance(App.USER_ID);
+
+		// SUBTRACT THE FUNDS TRANSFERED FROM THE SENDER'S BALANCE
+		BigDecimal currentUserUpdatedBalance = currentUserBalance.subtract(selectedTransfer.getAmount());
+
+		// CREATE ZERO BALANCE VARIABLE IN BIG DECIMAL
+		BigDecimal zeroBalance = new BigDecimal(0);
+
+		// MAKE SURE THE SENDING USER HAS AT LEAST $0.00 LEFT AFTER TRANSFER
+		if (currentUserUpdatedBalance.compareTo(zeroBalance) >= 0) {
+
+			// CREATE A TRANSFER OBJECT TO CREATE AN APPROVED TRANSFER
+			Transfer transferObject = new Transfer();
+			transferObject.setTransfer_id(transferID);
+			transferObject.setTransfer_status_id(2);
+
+			try {
+				// SEND TRANSFER UPDATE
+				restTemplate.exchange(BASE_URL + "/transfers/" + transferID + "/approved/", HttpMethod.PUT,
+						makeTransferEntity(transferObject), Transfer.class);
+
+			} catch (RestClientResponseException ex) {
+
+				throw new TenmoServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+			}
 
 		} else {
 			System.out.println("Insufficient Funds");
@@ -366,7 +363,6 @@ public class TenmoService {
 	}
 
 	public void rejectTransfer(int transferID) throws TenmoServiceException {
-
 
 		// CREATE AN TRANSFER OBJECT TO CREATE A REJECTED TRANSFER
 		Transfer transferObject = new Transfer();
@@ -384,7 +380,7 @@ public class TenmoService {
 		}
 
 	}
-	
+
 	public void listPendingTransfers() {
 
 		String fromUsername = "";
@@ -392,43 +388,43 @@ public class TenmoService {
 		int toUserId = 0;
 		int fromUserId = 0;
 
-		// CREATE A TRANSFER ARRAY AND POPULATE WITH THE LIST OF PEDNIGN TRANSFERS
-		Transfer[] transferArray = restTemplate
-				.exchange(BASE_URL + "/transfers/transfer_status_id_1", HttpMethod.GET, makeAuthEntity(), Transfer[].class).getBody();
+		// CREATE A TRANSFER ARRAY AND POPULATE WITH THE LIST OF PENDING TRANSFERS
+		Transfer[] transferArray = restTemplate.exchange(BASE_URL + "/transfers/transfer_status_id_1", HttpMethod.GET,
+				makeAuthEntity(), Transfer[].class).getBody();
 
 		// ITERATE THROUGH TRANSFER ARRAY
 		for (Transfer thisTransfer : transferArray) {
 
-			// EXCHANGE "ACCOUNT_TO" FOR THE SENDING USERS ID
+			// EXCHANGE ACCOUNT_ID ("ACCOUNT_TO") FOR THE SENDING USER_ID
 			toUserId = restTemplate.exchange(BASE_URL + "/accounts/" + thisTransfer.getAccount_to() + "/userId",
 					HttpMethod.GET, makeAuthEntity(), int.class).getBody();
 
-			// EXCHANGE SEDNING USERS ID FOR SENDING USERS NAME
+			// EXCHANGE SENDING USER_ID FOR SENDING USERNAME
 			toUserName = restTemplate.exchange(BASE_URL + "/users/" + toUserId + "/username", HttpMethod.GET,
 					makeAuthEntity(), String.class).getBody();
 
-			// CHECK UF CURRENT USERNAME EQUALS THE SENDING USERS NAME
+			// CHECK UF CURRENT USERNAME EQUALS THE SENDING USERNAME
 			if (App.USER_NAME.equals(toUserName)) {
 
-				// EXCHANGE "ACCOUNT_FOM" FOR THE REQUESTING USERS ID
+				// EXCHANGE ACCOUNT_ID ("ACCOUNT_FROM") FOR THE REQUESTING USER_ID
 				fromUserId = restTemplate.exchange(BASE_URL + "/accounts/" + thisTransfer.getAccount_from() + "/userId",
 						HttpMethod.GET, makeAuthEntity(), int.class).getBody();
 
-				// EXCHANGE REQUESTING USERS ID FOR THE REQUESTING USERS NAME
+				// EXCHANGE REQUESTING USER_ID FOR THE REQUESTING USERNAME
 				fromUsername = restTemplate.exchange(BASE_URL + "/users/" + fromUserId + "/username", HttpMethod.GET,
 						makeAuthEntity(), String.class).getBody();
 
-				System.out.println(thisTransfer.getTransfer_id() + "\t\t " + fromUsername + "\t\t\t$ "
-						+ thisTransfer.getAmount());
+				System.out.println(
+						thisTransfer.getTransfer_id() + "\t\t " + fromUsername + "\t\t\t$ " + thisTransfer.getAmount());
 
 			}
 		}
-	}	
-	
+	}
+
 	public BigDecimal getAmountByTransferId(int transferId) throws TenmoServiceException {
 
 		BigDecimal transferAmount = null;
-		// EXCHANGE CURRENT USERS ID FOR CURRENT USERS BALANCE
+		// EXCHANGE CURRENT USER'S USER_ID FOR CURRENT USER'S BALANCE
 		try {
 			transferAmount = restTemplate.exchange(BASE_URL + "/transfers/" + transferId + "/amount", HttpMethod.GET,
 					makeAuthEntity(), BigDecimal.class).getBody();
@@ -439,16 +435,16 @@ public class TenmoService {
 		return transferAmount;
 
 	}
-	
+
 	public int getRecUserIdByTranferId(int transferId) {
-		
+
 		int userId = 0;
-		// EXCHANGE TRANSFER ID FOR RECIEVING USER'S ID NUMBER
-			userId = restTemplate.exchange(BASE_URL + "/transfers/" + transferId + "/accounts", HttpMethod.GET,
-					makeAuthEntity(), int.class).getBody();
+		// EXCHANGE TRANSFER ID FOR RECIEVING USER'S USER_ID
+		userId = restTemplate.exchange(BASE_URL + "/transfers/" + transferId + "/accounts", HttpMethod.GET,
+				makeAuthEntity(), int.class).getBody();
 		return userId;
 	}
-	
+
 	public void recievingUserAccountUpdate(int userId, BigDecimal amountTEBucks) throws TenmoServiceException {
 
 		// GET RECEIVING PARTY USER BALANCE
