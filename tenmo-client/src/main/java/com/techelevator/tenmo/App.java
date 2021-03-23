@@ -49,6 +49,7 @@ public class App {
 		app.run();
 	}
 
+	//	APP METHOD TO BE INSTANTIATED AND CALLED IN STATIC VOID MAIN
 	public App(ConsoleService console, AuthenticationService authenticationService, TenmoService currentTenmoService) {
 		this.console = console;
 		this.authenticationService = authenticationService;
@@ -142,13 +143,18 @@ public class App {
 		int inputOption = 0;
 		inputOption = console.getUserInputInteger("Please choose an option ");
 
+		//	APPROVE
 		if (inputOption == 1) {
 
 			try {
+				// UPDATE TRANSFER USING TRANSFER_ID
 				currentTenmoService.approveTransfer(inputTransferId);
+				// UPDATE CURRENT USER BALANCE
 				currentTenmoService.currentUserAccountUpdate(currentUser.getUser().getId(),
 						currentTenmoService.getAmountByTransferId(inputTransferId));
+				// GET RECEIVING USER_ID FROM TRANSFER_ID
 				int recievingUserId = currentTenmoService.getRecUserIdByTranferId(inputTransferId);
+				// UPDATE RECEIVING USER BALANCE
 				currentTenmoService.recievingUserAccountUpdate(recievingUserId,
 						currentTenmoService.getAmountByTransferId(inputTransferId));
 				System.out.println("Congratulations, you have approved the transfer of $"
@@ -163,6 +169,7 @@ public class App {
 			}
 		}
 
+		//	REJECT
 		if (inputOption == 2) {
 			try {
 				currentTenmoService.rejectTransfer(inputTransferId);
@@ -192,13 +199,17 @@ public class App {
 			BigDecimal userInputAmount = null;
 			userInputAmount = console.getUserInputBigDecimal("Enter amount ");
 
+			//	USES BOOLEAN METHOD MAKEATRANSFER TO DETERMINE IF FUNDS ARE SUFFICIENT TO SENDBUCKS
+			//	IF SUFFICIENT FUNDS
 			if (currentTenmoService.makeATransfer(currentUser.getUser().getId(), toUserInputId,
 					userInputAmount) == true) {
 
+				// UPDATE BOTH USERS BALANCES
 				currentTenmoService.currentUserAccountUpdate(currentUser.getUser().getId(), userInputAmount);
 				currentTenmoService.toUserAccountUpdate(toUserInputId, userInputAmount);
 				System.out.println("Congratulations, your transfer was successful");
-
+				
+				// IF NOT ENOUGH FUNDS - MAKEATRANSFER == FALSE
 			} else {
 				System.out.println("You do not have enough funds for this transfer. Please try again!");
 			}

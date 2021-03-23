@@ -39,11 +39,11 @@ public interface TenmoServicesDAO {
 
 	int getAccountIdFromUserId(int userId) throws UserIdNotFoundException;
 
+	List<Transfer> getAllPendingTransfers();
+	
 	void approvedTransfer(int transferID);
 
 	void rejectedTransfer(int transferID);
-
-	List<Transfer> getAllPendingTransfers();
 
 	BigDecimal getTransferAmountByTransferID(int transferID);
 

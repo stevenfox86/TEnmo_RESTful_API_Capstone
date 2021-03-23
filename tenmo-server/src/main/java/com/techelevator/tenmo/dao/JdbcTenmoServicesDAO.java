@@ -203,6 +203,22 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 
 	}
 
+	// GET A LIST OF ALL TRANSFERS - TRANSFER STATUS PENDING
+	@Override
+	public List<Transfer> getAllPendingTransfers() {
+		List<Transfer> allPendingTransfers = new ArrayList<>();
+
+		String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount FROM transfers WHERE transfer_status_id = 1";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+
+		while (results.next()) {
+			Transfer transferObject = mapRowToTransfer(results);
+			allPendingTransfers.add(transferObject);
+
+		}
+		return allPendingTransfers;
+	}
+	
 	// UPDATE TRANSFER STATUS TO APPROVED
 	@Override
 	public void approvedTransfer(int transferID) {
@@ -219,22 +235,6 @@ public class JdbcTenmoServicesDAO implements TenmoServicesDAO {
 		String sqlFromUser = "UPDATE transfers SET transfer_status_id = 3 WHERE transfer_id = ?";
 		jdbcTemplate.update(sqlFromUser, transferID);
 
-	}
-
-	// GET A LIST OF ALL TRANSFERS - TRANSFER STATUS PENDING
-	@Override
-	public List<Transfer> getAllPendingTransfers() {
-		List<Transfer> allPendingTransfers = new ArrayList<>();
-
-		String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount FROM transfers WHERE transfer_status_id = 1";
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-
-		while (results.next()) {
-			Transfer transferObject = mapRowToTransfer(results);
-			allPendingTransfers.add(transferObject);
-
-		}
-		return allPendingTransfers;
 	}
 
 	// GET TRANSFER AMOUNT BY TRANSFER_ID
